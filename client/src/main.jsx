@@ -4,6 +4,8 @@ import axios from "axios";
 import { BarChart3, CheckCircle2, ChevronDown, ChevronUp, Clock3, Download, Eye, EyeOff, FileSpreadsheet, FileUp, Film, Instagram, LogOut, Search, XCircle } from "lucide-react";
 import "./styles.css";
 
+axios.defaults.withCredentials = true;
+
 const initial = { totalUrls: 0, successful: 0, failed: 0, posts: 0, reels: 0, datesFound: 0 };
 const fmtDate = (item) => item.publishedAtIst?.slice(0, 10) || null;
 const fmtTime = (item) => item.publishedAtIst?.slice(11) || "Unavailable";
@@ -36,7 +38,8 @@ function App() {
     event.preventDefault();
     setAuthError("");
     try {
-      await axios.post("/api/auth/login", loginForm);
+      const { data } = await axios.post("/api/auth/login", loginForm);
+      if (!data.authenticated) throw new Error("Authentication was not completed");
       setAuthState("authenticated");
     } catch (error) {
       setAuthError(error.response?.data?.error || "Unable to sign in");

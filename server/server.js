@@ -5,6 +5,8 @@ import cookieParser from "cookie-parser";
 import bcrypt from "bcryptjs";
 import rateLimit from "express-rate-limit";
 import { randomUUID } from "node:crypto";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import multer from "multer";
 import { parse } from "csv-parse/sync";
 import { processInstagramUrl } from "./services/instagramMetadata.js";
@@ -13,6 +15,7 @@ import { toCsv, toExcel } from "./services/export.js";
 import { authStatus, issueSession, requireAuth, COOKIE_NAME } from "./middleware/auth.js";
 
 const app = express();
+const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
 const reports = [];
 app.use(cors({
@@ -136,6 +139,12 @@ app.post("/api/export/excel", (req, res) => {
   });
 });
 app.get("/api/health", (_req, res) => res.json({ ok: true }));
+
+app.use(express.static(path.join(projectRoot, "client", "dist")));
+app.get("*", (req, res, next) => {
+  if (req.path.startsWith("/api/")) return next();
+  return res.sendFile(path.join(projectRoot, "client", "dist", "index.html"));
+});
 
 const port = process.env.PORT || 4000;
 app.listen(port, () => console.log(`API listening on http://localhost:${port}`));
