@@ -141,11 +141,16 @@ Run the existing service tests:
 npm test
 ```
 
-Create a production frontend build:
+Create a production frontend build. The root build command also installs the separate frontend dependencies, which is required on deployment services such as Render:
 
 ```bash
 npm run build
 ```
+
+On Render, use:
+
+- **Build Command:** `npm install && npm run build`
+- **Start Command:** `npm start`
 
 ## Security checklist
 
